@@ -23,6 +23,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E73197F3222496B10008CF4C /* bzip.trace */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bzip.trace; sourceTree = "<group>"; };
+		E73197F4222496B10008CF4C /* gcc.trace */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = gcc.trace; sourceTree = "<group>"; };
+		E73197F5222496B10008CF4C /* sixpack.trace */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sixpack.trace; sourceTree = "<group>"; };
+		E73197F6222496B10008CF4C /* swim.trace */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = swim.trace; sourceTree = "<group>"; };
 		E7487913221DC0E700E10F26 /* Memsim */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Memsim; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7487916221DC0E800E10F26 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -57,6 +61,10 @@
 		E7487915221DC0E700E10F26 /* Memsim */ = {
 			isa = PBXGroup;
 			children = (
+				E73197F3222496B10008CF4C /* bzip.trace */,
+				E73197F4222496B10008CF4C /* gcc.trace */,
+				E73197F5222496B10008CF4C /* sixpack.trace */,
+				E73197F6222496B10008CF4C /* swim.trace */,
 				E7487916221DC0E800E10F26 /* main.c */,
 			);
 			path = Memsim;

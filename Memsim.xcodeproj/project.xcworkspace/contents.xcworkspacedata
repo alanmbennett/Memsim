@@ -2,6 +2,18 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:Memsim.xcodeproj">
+      location = "group:/Users/Alan/Documents/USF/2019/Spring_2019/COP 4600/Project 2/Memsim/Memsim/bzip.trace">
+   </FileRef>
+   <FileRef
+      location = "group:/Users/Alan/Documents/USF/2019/Spring_2019/COP 4600/Project 2/Memsim/Memsim/gcc.trace">
+   </FileRef>
+   <FileRef
+      location = "group:/Users/Alan/Documents/USF/2019/Spring_2019/COP 4600/Project 2/Memsim/Memsim/sixpack.trace">
+   </FileRef>
+   <FileRef
+      location = "group:/Users/Alan/Documents/USF/2019/Spring_2019/COP 4600/Project 2/Memsim/Memsim/swim.trace">
+   </FileRef>
+   <FileRef
+      location = "self:">
    </FileRef>
 </Workspace>

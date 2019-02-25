@@ -69,7 +69,7 @@ int main(int argc, const char * argv[])
 
 void lru(FILE *traceFile, int nframes, char* mode)
 {
-    
+    printf("ENTER THE LRU\n");
 }
 
 void fifo(FILE *traceFile, int nframes, char* mode)
