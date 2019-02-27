@@ -77,13 +77,63 @@ int main(int argc, const char * argv[])
 
 void lru(FILE *file, int nframes, char* mode)
 {
+    List LRUQueue = listConstructor();
+    List dirty = listConstructor();
+    int disk_reads = 0, disk_writes = 0, events = 0;
+    unsigned addr;
+    char rw;
+    
+    while (fscanf(file, "%x %c", &addr, &rw) != EOF)
+    {
+        addr = extractPageNo(addr);
+        
+        if(!existsInList(&LRUQueue, addr))
+        {
+            disk_reads++;
+            
+            if(LRUQueue.length == nframes)
+            {
+                unsigned replaced = delete_front(&LRUQueue);
+                add(&LRUQueue, addr);
+                
+                if(existsInList(&dirty, replaced))
+                {
+                    disk_writes++;
+                    deleteByVal(&dirty, replaced);
+                }
+            }
+            else
+            {
+                add(&LRUQueue, addr);
+            }
+        }
+        else // exists in the list
+        {
+            /* Now is the most recently used so delete from queue and insert in the back position */
+            deleteByVal(&LRUQueue, addr);
+            add(&LRUQueue, addr);
+        }
+        
+        if(rw == 'W')
+            add(&dirty, addr);
+        
+        if(strcmp("debug", mode) == 0)
+        {
+            printList(&LRUQueue);
+            printf("\n");
+        }
+    }
+    
+    deleteList(&LRUQueue);
+    
+    printFinalStats(nframes, events, disk_reads, disk_writes);
 }
 
 void fifo(FILE *file, int nframes, char* mode)
 {
     Queue q = queueConstructor(nframes);
     List dirty = listConstructor();
-    int disk_reads = 0, disk_writes = 0;
+    int disk_reads = 0, disk_writes = 0, events = 0;
     unsigned addr;
     char rw;
     
@@ -93,6 +143,8 @@ void fifo(FILE *file, int nframes, char* mode)
         
         if(!existsInQueue(&q, addr))
         {
+            disk_reads++;
+            
             if(!enqueue(&q, addr))
             {
                 unsigned replaced = dequeue(&q);
@@ -118,7 +170,7 @@ void fifo(FILE *file, int nframes, char* mode)
     
     deleteQueue(&q);
     
-    printFinalStats(nframes, 0, disk_reads, disk_writes);
+    printFinalStats(nframes, events, disk_reads, disk_writes);
 }
 
 void vms(FILE *file, int nframes, char* mode)
