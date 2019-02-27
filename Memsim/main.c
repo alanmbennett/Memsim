@@ -3,10 +3,23 @@
 #include <string.h>
 
 /* Function prototypes */
-void lru(FILE *traceFile, int nframes, char* mode);
-void fifo(FILE *traceFile, int nframes, char* mode);
-void vms(FILE *traceFile, int nframes, char* mode);
+void lru(FILE *file, int nframes, char* mode);
+void fifo(FILE *file, int nframes, char* mode);
+void vms(FILE *file, int nframes, char* mode);
+unsigned extractPageNo(unsigned hex);
 void printFinalStats(int frames, long int events, long int reads, long int writes);
+
+// 4 KB pages => 2^2 * 2^10 = 2^12 = 12-bit offset
+// 32-bit memory addresses
+// 32 - 12 = 20-bit page #
+// 2^32 / 2^12 = 2^20 entries in page table
+
+const int ENTRIES = 1048576; // 2^32 / 2^12 = 2^20 = 1048576 possible pages
+unsigned disk[ENTRIES];
+unsigned dirty[ENTRIES];
+unsigned clean[ENTRIES];
+unsigned *RAM;
+int disk_reads = 0, disk_writes = 0;
 
 int main(int argc, const char * argv[])
 {
@@ -31,6 +44,7 @@ int main(int argc, const char * argv[])
     strcpy(algorithm, argv[3]);
     strcpy(mode, argv[4]);
     nframes = atoi(argv[2]);
+    RAM = malloc(nframes * sizeof(unsigned));
     
     /* Mode error-checking */
     if(strcmp("quiet", mode) != 0)
@@ -67,19 +81,22 @@ int main(int argc, const char * argv[])
     return EXIT_SUCCESS;
 }
 
-void lru(FILE *traceFile, int nframes, char* mode)
+void lru(FILE *file, int nframes, char* mode)
 {
-    printf("ENTER THE LRU\n");
 }
 
-void fifo(FILE *traceFile, int nframes, char* mode)
+void fifo(FILE *file, int nframes, char* mode)
 {
     
 }
 
-void vms(FILE *traceFile, int nframes, char* mode)
+void vms(FILE *file, int nframes, char* mode)
 {
-    
+}
+
+unsigned extractPageNo(unsigned hex)
+{
+    return (hex & 0xfffff000) / 0x1000;
 }
 
 void printFinalStats(int frames, long int events, long int reads, long int writes)
