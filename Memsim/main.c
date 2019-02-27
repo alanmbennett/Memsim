@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "list.h"
 #include "queue.h"
 
 /* Function prototypes */
@@ -16,11 +17,8 @@ void printFinalStats(int frames, long int events, long int reads, long int write
 // 2^32 / 2^12 = 2^20 entries in page table
 
 const int ENTRIES = 1048576; // 2^32 / 2^12 = 2^20 = 1048576 possible pages
-unsigned disk[ENTRIES];
-unsigned dirty[ENTRIES];
-unsigned clean[ENTRIES];
-int disk_reads = 0, disk_writes = 0;
-
+unsigned dirty;
+unsigned clean;
 
 int main(int argc, const char * argv[])
 {
@@ -88,7 +86,30 @@ void lru(FILE *file, int nframes, char* mode)
 void fifo(FILE *file, int nframes, char* mode)
 {
     Queue q = queueConstructor(nframes);
-
+    unsigned addr;
+    char rw;
+    
+    while (fscanf(file, "%x %c", &addr, &rw) != EOF)
+    {
+        addr = extractPageNo(addr);
+        
+        if(!existsInQueue(&q, addr))
+        {
+            if(!enqueue(&q, addr))
+            {
+                dequeue(&q);
+                enqueue(&q, addr);
+            }
+        }
+        
+        if(strcmp("debug", mode) == 0)
+        {
+            printQueue(&q);
+            printf("\n");
+        }
+    }
+    
+    deleteQueue(&q);
 }
 
 void vms(FILE *file, int nframes, char* mode)
@@ -98,16 +119,6 @@ void vms(FILE *file, int nframes, char* mode)
 unsigned extractPageNo(unsigned hex)
 {
     return (hex & 0xfffff000) / 0x1000;
-}
-
-unsigned readInMemory(FILE* file)
-{
-    unsigned addr;
-    char rw;
-    
-    fscanf(file, "%x %c", &addr, &rw);
-    
-    return extractPageNo(addr);
 }
 
 void printFinalStats(int frames, long int events, long int reads, long int writes)

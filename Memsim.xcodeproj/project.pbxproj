@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E72C43522226E295003E8571 /* queue.c in Sources */ = {isa = PBXBuildFile; fileRef = E72C43512226E295003E8571 /* queue.c */; };
+		E72C435522270387003E8571 /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = E72C435422270387003E8571 /* list.c */; };
 		E7487917221DC0E800E10F26 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = E7487916221DC0E800E10F26 /* main.c */; };
 /* End PBXBuildFile section */
 
@@ -26,6 +27,8 @@
 /* Begin PBXFileReference section */
 		E72C43502226E295003E8571 /* queue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = queue.h; sourceTree = "<group>"; };
 		E72C43512226E295003E8571 /* queue.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = queue.c; sourceTree = "<group>"; };
+		E72C435322270387003E8571 /* list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
+		E72C435422270387003E8571 /* list.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = list.c; sourceTree = "<group>"; };
 		E73197F3222496B10008CF4C /* bzip.trace */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bzip.trace; sourceTree = "<group>"; };
 		E73197F4222496B10008CF4C /* gcc.trace */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = gcc.trace; sourceTree = "<group>"; };
 		E73197F5222496B10008CF4C /* sixpack.trace */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sixpack.trace; sourceTree = "<group>"; };
@@ -69,6 +72,8 @@
 				E73197F5222496B10008CF4C /* sixpack.trace */,
 				E73197F6222496B10008CF4C /* swim.trace */,
 				E7487916221DC0E800E10F26 /* main.c */,
+				E72C435322270387003E8571 /* list.h */,
+				E72C435422270387003E8571 /* list.c */,
 				E72C43502226E295003E8571 /* queue.h */,
 				E72C43512226E295003E8571 /* queue.c */,
 			);
@@ -132,6 +137,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E7487917221DC0E800E10F26 /* main.c in Sources */,
+				E72C435522270387003E8571 /* list.c in Sources */,
 				E72C43522226E295003E8571 /* queue.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

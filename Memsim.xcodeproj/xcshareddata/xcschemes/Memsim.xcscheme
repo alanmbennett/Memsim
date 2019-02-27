@@ -76,7 +76,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "quiet"
+            argument = "debug"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
