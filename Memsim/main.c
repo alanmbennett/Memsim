@@ -16,10 +16,6 @@ void printFinalStats(int frames, long int events, long int reads, long int write
 // 32 - 12 = 20-bit page #
 // 2^32 / 2^12 = 2^20 entries in page table
 
-const int ENTRIES = 1048576; // 2^32 / 2^12 = 2^20 = 1048576 possible pages
-unsigned dirty;
-unsigned clean;
-
 int main(int argc, const char * argv[])
 {
     /* Variables */
@@ -86,6 +82,8 @@ void lru(FILE *file, int nframes, char* mode)
 void fifo(FILE *file, int nframes, char* mode)
 {
     Queue q = queueConstructor(nframes);
+    List dirty = listConstructor();
+    int disk_reads = 0, disk_writes = 0;
     unsigned addr;
     char rw;
     
@@ -97,10 +95,19 @@ void fifo(FILE *file, int nframes, char* mode)
         {
             if(!enqueue(&q, addr))
             {
-                dequeue(&q);
+                unsigned replaced = dequeue(&q);
                 enqueue(&q, addr);
+                
+                if(existsInList(&dirty, replaced))
+                {
+                    disk_writes++;
+                    deleteByVal(&dirty, replaced);
+                }
             }
         }
+        
+        if(rw == 'W')
+            add(&dirty, addr);
         
         if(strcmp("debug", mode) == 0)
         {
@@ -110,6 +117,8 @@ void fifo(FILE *file, int nframes, char* mode)
     }
     
     deleteQueue(&q);
+    
+    printFinalStats(nframes, 0, disk_reads, disk_writes);
 }
 
 void vms(FILE *file, int nframes, char* mode)
@@ -124,7 +133,7 @@ unsigned extractPageNo(unsigned hex)
 void printFinalStats(int frames, long int events, long int reads, long int writes)
 {
     printf("total memory frames: %d\n", frames);
-    printf("events in trace: %ld", events);
-    printf("total disk reads: %ld", reads);
-    printf("total disk writes: %ld", writes);
+    printf("events in trace: %ld\n", events);
+    printf("total disk reads: %ld\n", reads);
+    printf("total disk writes: %ld\n\n", writes);
 }
