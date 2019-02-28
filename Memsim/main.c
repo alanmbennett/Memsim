@@ -8,7 +8,10 @@
 void lru(FILE *file, int nframes, char* mode);
 void fifo(FILE *file, int nframes, char* mode);
 void vms(FILE *file, int nframes, char* mode);
+void performVms(Queue *q, unsigned addr, List *clean, List *dirty, List *write, List *memory, int nframes, int* reads, int* writes);
+unsigned first_out(List *clean, List*dirty, List*write, int* writes);
 unsigned extractPageNo(unsigned hex);
+int startsWithThree(unsigned hex);
 void printFinalStats(int frames, long int events, long int reads, long int writes);
 
 // 4 KB pages => 2^2 * 2^10 = 2^12 = 12-bit offset
@@ -72,6 +75,8 @@ int main(int argc, const char * argv[])
         return EXIT_FAILURE;
     }
     
+    fclose(fp);
+    
     return EXIT_SUCCESS;
 }
 
@@ -122,9 +127,12 @@ void lru(FILE *file, int nframes, char* mode)
             printList(&LRUQueue);
             printf("\n");
         }
+        
+        events++;
     }
     
     deleteList(&LRUQueue);
+    deleteList(&dirty);
     
     printFinalStats(nframes, events, disk_reads, disk_writes);
 }
@@ -166,20 +174,136 @@ void fifo(FILE *file, int nframes, char* mode)
             printQueue(&q);
             printf("\n");
         }
+        
+        events++;
     }
     
     deleteQueue(&q);
+    deleteList(&dirty);
     
     printFinalStats(nframes, events, disk_reads, disk_writes);
 }
 
 void vms(FILE *file, int nframes, char* mode)
 {
+    int RSS = nframes/2;
+    Queue qA = queueConstructor(RSS); // for process A
+    Queue qB = queueConstructor(RSS); // for process B
+    List clean = listConstructor();
+    List dirty = listConstructor();
+    List write = listConstructor();
+    List memory = listConstructor();
+    int disk_reads = 0, disk_writes = 0, events = 0;
+    unsigned addr;
+    char rw;
+    
+    while (fscanf(file, "%x %c", &addr, &rw) != EOF)
+    {
+        addr = extractPageNo(addr);
+        
+        if(rw == 'W')
+            add(&write, addr);
+        
+        if(startsWithThree(addr)) // belongs to process A
+            performVms(&qA, addr, &clean, &dirty, &write, &memory, nframes, &disk_reads, &disk_writes);
+        else // belongs to process B
+            performVms(&qB, addr, &clean, &dirty, &write, &memory, nframes, &disk_reads, &disk_writes);
+        
+        if(strcmp("debug", mode) == 0)
+        {
+            printf("FIFO(A): ");
+            printQueue(&qA);
+            printf("\n");
+            printf("FIFO(B): ");
+            printQueue(&qB);
+            printf("\n");
+            printf("Memory: ");
+            printList(&memory);
+            printf("\n\n");
+        }
+        
+        events++;
+    }
+    
+    deleteQueue(&qA);
+    deleteQueue(&qB);
+    deleteList(&clean);
+    deleteList(&dirty);
+    deleteList(&write);
+    deleteList(&memory);
+    
+    printFinalStats(nframes, events, disk_reads, disk_writes);
+}
+
+void performVms(Queue *q, unsigned addr, List *clean, List *dirty, List *write, List *memory, int nframes, int* reads, int* writes)
+{
+    if(!existsInQueue(q, addr))
+    {
+        (*reads)++;
+        if(!enqueue(q, addr))
+        {
+            unsigned page_out = dequeue(q);
+            enqueue(q, addr);
+            
+            if(!existsInList(write, page_out))
+            {
+                add(clean, page_out);
+            }
+            else
+                add(dirty, page_out);
+        }
+        
+        if(existsInList(memory, addr))
+        {
+            if(existsInList(clean, addr))
+                deleteByVal(clean, addr);
+            else if(existsInList(dirty, addr))
+            {
+                deleteByVal(dirty, addr);
+                deleteByVal(write, addr);
+                (*writes)++;
+            }
+        }
+        else
+        {
+            if(memory->length < nframes)
+                add(memory, addr);
+            else
+            {
+                unsigned frame_to_empty = first_out(clean, dirty, write, writes);
+                deleteByVal(memory, frame_to_empty);
+                add(memory, addr);
+            }
+        }
+    }
+}
+
+unsigned first_out(List *clean, List*dirty, List*write, int* writes)
+{
+    if(clean->length > 0)
+        return delete_front(clean);
+    else
+    {
+        (*writes)++;
+        unsigned val = delete_front(dirty);
+        deleteByVal(write, val);
+        return val;
+    }
 }
 
 unsigned extractPageNo(unsigned hex)
 {
     return (hex & 0xfffff000) / 0x1000;
+}
+
+int startsWithThree(unsigned hex)
+{
+    unsigned number = (hex & 0xf0000) / 0x10000;
+    
+    if(number == 0x3)
+        return 1; // true
+    
+    return 0; // false
 }
 
 void printFinalStats(int frames, long int events, long int reads, long int writes)

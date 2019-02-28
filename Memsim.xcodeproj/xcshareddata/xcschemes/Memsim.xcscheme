@@ -68,11 +68,11 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "4"
+            argument = "8"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "lru"
+            argument = "vms"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
